@@ -3,26 +3,23 @@ import './App.css';
 import Line from './Line';
 
 function App() {
-  let cy = 70;
+  let cy = 160;
   let cx = 70;
   let x1 = 70;
-  let y1 = 70;
+  let y1 = 160;
   // ideas for CRUD - undo last move, save game
   return (
     <div className="App">
       <header className="App-header">
-        <svg height="600" width="500" viewBox="0 0 500 500" >
-          <rect width="600" height="500" fill="lightblue"/>
-          {[...Array(25)].map((key, i) => {
-            let result = <circle cx={cx} cy={cy} r="10" fill="maroon"key={i}/>;
-            cy += 90;
-            if((i+1) % 5 === 0){
-              cy = 70;
-              cx+= 90;
-            }
-            return result;
-            }
-          )}
+        <svg height="500" width="500" viewBox="0 0 600 600" >
+
+          <circle cx="30" cy="17" r="17" fill="#F29745"/>
+          <rect x="5" y="35" width="50" height="30" rx="10" fill="#F29745"/>
+
+          <circle cx="470" cy="17" r="17" fill="#80BF5E"/>
+          <rect x="445" y="35" width="50" height="30" rx="10" fill="#80BF5E"/>
+
+          <rect y="90" width="500" height="500" fill="lightblue"/>
           {
             [...Array(25)].map((key, i) => {
             let result = [];
@@ -34,8 +31,18 @@ function App() {
             }
             y1 += 90;
             if((i+1) % 5 === 0){
-              y1 = 70;
+              y1 = 160;
               x1+= 90;
+            }
+            return result;
+            }
+          )}
+          {[...Array(25)].map((key, i) => {
+            let result = <circle cx={cx} cy={cy} r="10" fill="maroon" key={i}/>;
+            cy += 90;
+            if((i+1) % 5 === 0){
+              cy = 160;
+              cx+= 90;
             }
             return result;
             }

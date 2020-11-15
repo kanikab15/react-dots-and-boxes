@@ -26,10 +26,12 @@
 .App-link {
   color: #61dafb;
 }
-
-.line:hover
+.line {
+  stroke:transparent;
+}
+.line:hover, .line-clicked
  {
-  stroke: palevioletred;
+  stroke: #52796f;
 }
 
 @keyframes App-logo-spin {

@@ -12,8 +12,6 @@ class App extends React.Component {
   componentDidMount(){
     let cy = 160;
     let cx = 70;
-    let x1 = 70;
-    let y1 = 160;
     // ideas for CRUD - undo last move, save game
     const numOfRowCols = 5;
     const numOfDots = numOfRowCols*numOfRowCols;
@@ -21,6 +19,7 @@ class App extends React.Component {
     const lineCoordinates = {};
     const boxCoordinates = {};
 
+    // find dot coordinates
     for(let i=0; i<numOfDots; i++){
       dotCoordinates[i] = {'x': cx,'y': cy};
       cy += 90;
@@ -30,18 +29,21 @@ class App extends React.Component {
       }
     }
 
+    // find line coordinates
     for(let i=0;i<numOfDots;i++){
       if(i<numOfDots-numOfRowCols)
-        lineCoordinates[i]={'x1': x1,'y1': y1, 'x2':x1+90, 'y2':y1};
+        lineCoordinates[i]={
+                            'x1': dotCoordinates[i].x,'y1': dotCoordinates[i].y,
+                            'x2': dotCoordinates[i+numOfRowCols].x, 'y2':dotCoordinates[i+numOfRowCols].y
+                          };
       if((i+1) % numOfRowCols !== 0)
-        lineCoordinates[i+(numOfDots-numOfRowCols)]={'x1': x1,'y1': y1, 'x2':x1, 'y2':y1+90};
-        y1 += 90;
-      if((i+1) % numOfRowCols === 0){
-          y1 = 160;
-          x1+= 90;
-        }
+        lineCoordinates[i+(numOfDots-numOfRowCols)]={
+                                                  'x1': dotCoordinates[i].x,'y1': dotCoordinates[i].y,
+                                                  'x2': dotCoordinates[i+1].x, 'y2':dotCoordinates[i+1].y
+                                                };
     }
 
+    // find box coordinates
     for(let i=0;i<numOfDots;i++){
       if((i+numOfRowCols+1)<numOfDots && (i+1)%numOfRowCols!==0){
         boxCoordinates[i]={
@@ -50,6 +52,18 @@ class App extends React.Component {
                           'x3': dotCoordinates[i+numOfRowCols+1].x, 'y3':dotCoordinates[i+numOfRowCols+1].y,
                           'x4': dotCoordinates[i+1].x,'y4': dotCoordinates[i+1].y
                         };
+        // let line1 = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
+        //   x2: boxCoordinates[i].x2, y2: boxCoordinates[i].y2}, lineCoordinates);
+        // let line2 = this.findALineFromCoordinates({x1:boxCoordinates[i].x2, y1:boxCoordinates[i].y2,
+        //   x2: boxCoordinates[i].x3, y2: boxCoordinates[i].y3}, lineCoordinates);
+        // let line3 = this.findALineFromCoordinates({x1:boxCoordinates[i].x4, y1:boxCoordinates[i].y4,
+        //   x2: boxCoordinates[i].x3, y2: boxCoordinates[i].y3}, lineCoordinates);
+        // let line4 = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
+        //   x2: boxCoordinates[i].x4, y2: boxCoordinates[i].y4}, lineCoordinates);
+        // console.log(line1);
+        // console.log(line2);
+        // console.log(line3);
+        // console.log(line4);
       }
     }
 
@@ -57,7 +71,7 @@ class App extends React.Component {
                     dotCoordinates: dotCoordinates,
                     boxCoordinates: boxCoordinates},()=>{
       // console.log(this.findALineFromCoordinates({x1:430,y1:430, x2:430,y2:520}));
-      console.log(this.state.boxCoordinates);
+      // console.log(this.state.boxCoordinates);
     });
   }
 
@@ -83,7 +97,7 @@ class App extends React.Component {
                 points+= `${this.state.boxCoordinates[iNum].x2},${this.state.boxCoordinates[iNum].y2} `;
                 points+= `${this.state.boxCoordinates[iNum].x3},${this.state.boxCoordinates[iNum].y3} `;
                 points+= `${this.state.boxCoordinates[iNum].x4},${this.state.boxCoordinates[iNum].y4} `;
-                return <polygon points={points} fill="#B7B7B7" stroke="white"/>;
+                return <polygon key={i} points={points} fill="#B7B7B7" stroke="white"/>;
                 }
               )
             }
@@ -108,14 +122,14 @@ class App extends React.Component {
     );
   }
 
-  findALineFromCoordinates({x1,y1,x2,y2}){
-    let lineItems = Object.entries(this.state.lineCoordinates);
+  findALineFromCoordinates({x1,y1,x2,y2}, lineCoordinates){
+    let lineItems = lineCoordinates? (Object.entries(lineCoordinates)): Object.entries(this.state.lineCoordinates);
     let result={};
     for(let i=0;i<lineItems.length;i++)
     {
       let lineItem = lineItems[i][1];
       if(lineItem.x1===x1 && lineItem.x2===x2 && lineItem.y1===y1 && lineItem.y2===y2){
-        result = lineItem; break;
+        result = lineItems[i]; break;
       }
     }
     return result;

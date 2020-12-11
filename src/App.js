@@ -6,7 +6,8 @@ class App extends React.Component {
   state = {
     dotCoordinates : {},
     lineCoordinates: {},
-    boxCoordinates: {}
+    boxCoordinates: {},
+    lineToBoxes: {}
   };
 
   componentDidMount(){
@@ -18,6 +19,7 @@ class App extends React.Component {
     const dotCoordinates = {};
     const lineCoordinates = {};
     const boxCoordinates = {};
+    const lineToBoxes = {};
 
     // find dot coordinates
     for(let i=0; i<numOfDots; i++){
@@ -52,26 +54,39 @@ class App extends React.Component {
                           'x3': dotCoordinates[i+numOfRowCols+1].x, 'y3':dotCoordinates[i+numOfRowCols+1].y,
                           'x4': dotCoordinates[i+1].x,'y4': dotCoordinates[i+1].y
                         };
-        // let line1 = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
-        //   x2: boxCoordinates[i].x2, y2: boxCoordinates[i].y2}, lineCoordinates);
-        // let line2 = this.findALineFromCoordinates({x1:boxCoordinates[i].x2, y1:boxCoordinates[i].y2,
-        //   x2: boxCoordinates[i].x3, y2: boxCoordinates[i].y3}, lineCoordinates);
-        // let line3 = this.findALineFromCoordinates({x1:boxCoordinates[i].x4, y1:boxCoordinates[i].y4,
-        //   x2: boxCoordinates[i].x3, y2: boxCoordinates[i].y3}, lineCoordinates);
-        // let line4 = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
-        //   x2: boxCoordinates[i].x4, y2: boxCoordinates[i].y4}, lineCoordinates);
-        // console.log(line1);
-        // console.log(line2);
-        // console.log(line3);
-        // console.log(line4);
+        //find lines related to each box
+        let line0 = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
+          x2: boxCoordinates[i].x2, y2: boxCoordinates[i].y2}, lineCoordinates);
+        let line1 = this.findALineFromCoordinates({x1:boxCoordinates[i].x2, y1:boxCoordinates[i].y2,
+          x2: boxCoordinates[i].x3, y2: boxCoordinates[i].y3}, lineCoordinates);
+        let line2 = this.findALineFromCoordinates({x1:boxCoordinates[i].x4, y1:boxCoordinates[i].y4,
+          x2: boxCoordinates[i].x3, y2: boxCoordinates[i].y3}, lineCoordinates);
+        let line3 = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
+          x2: boxCoordinates[i].x4, y2: boxCoordinates[i].y4}, lineCoordinates);
+
+        //map box to lines
+        boxCoordinates[i].line0 = line0;
+        boxCoordinates[i].line1 = line1;
+        boxCoordinates[i].line2 = line2;
+        boxCoordinates[i].line3 = line3;
+
+        // map lines to boxes: TODO: should probably be added to lineCoordinates
+        lineToBoxes[line0[0]] = lineToBoxes[line0[0]] ? [...lineToBoxes[line0[0]], i]:[i];
+        lineToBoxes[line1[0]] = lineToBoxes[line1[0]] ? [...lineToBoxes[line1[0]], i]:[i];
+        lineToBoxes[line2[0]] = lineToBoxes[line2[0]] ? [...lineToBoxes[line2[0]], i]:[i];
+        lineToBoxes[line3[0]] = lineToBoxes[line3[0]] ? [...lineToBoxes[line3[0]], i]:[i];
       }
     }
 
     this.setState({ lineCoordinates: lineCoordinates,
                     dotCoordinates: dotCoordinates,
-                    boxCoordinates: boxCoordinates},()=>{
+                    boxCoordinates: boxCoordinates,
+                    lineToBoxes: lineToBoxes
+                  },()=>{
       // console.log(this.findALineFromCoordinates({x1:430,y1:430, x2:430,y2:520}));
       // console.log(this.state.boxCoordinates);
+      // console.log(this.state.lineCoordinates);
+      console.log(this.state.lineToBoxes);
     });
   }
 

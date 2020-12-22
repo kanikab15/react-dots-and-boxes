@@ -1,13 +1,16 @@
 import React from 'react';
 import './App.css';
 import Line from './Line';
+import Box from './Box';
+import {ClickedContext} from './ClickedContext';
 
 class App extends React.Component {
   state = {
     dotCoordinates : {},
     lineCoordinates: {},
     boxCoordinates: {},
-    lineToBoxes: {}
+    lineToBoxes: {},
+    clickedLineId:""
   };
 
   componentDidMount(){
@@ -55,26 +58,26 @@ class App extends React.Component {
                           'x4': dotCoordinates[i+1].x,'y4': dotCoordinates[i+1].y
                         };
         //find lines related to each box
-        let line0 = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
+        let line0Id = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
           x2: boxCoordinates[i].x2, y2: boxCoordinates[i].y2}, lineCoordinates);
-        let line1 = this.findALineFromCoordinates({x1:boxCoordinates[i].x2, y1:boxCoordinates[i].y2,
+        let line1Id = this.findALineFromCoordinates({x1:boxCoordinates[i].x2, y1:boxCoordinates[i].y2,
           x2: boxCoordinates[i].x3, y2: boxCoordinates[i].y3}, lineCoordinates);
-        let line2 = this.findALineFromCoordinates({x1:boxCoordinates[i].x4, y1:boxCoordinates[i].y4,
+        let line2Id = this.findALineFromCoordinates({x1:boxCoordinates[i].x4, y1:boxCoordinates[i].y4,
           x2: boxCoordinates[i].x3, y2: boxCoordinates[i].y3}, lineCoordinates);
-        let line3 = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
+        let line3Id = this.findALineFromCoordinates({x1:boxCoordinates[i].x1, y1:boxCoordinates[i].y1,
           x2: boxCoordinates[i].x4, y2: boxCoordinates[i].y4}, lineCoordinates);
 
         //map box to lines
-        boxCoordinates[i].line0 = line0;
-        boxCoordinates[i].line1 = line1;
-        boxCoordinates[i].line2 = line2;
-        boxCoordinates[i].line3 = line3;
+        boxCoordinates[i].line0Id = line0Id;
+        boxCoordinates[i].line1Id = line1Id;
+        boxCoordinates[i].line2Id = line2Id;
+        boxCoordinates[i].line3Id = line3Id;
 
         // map lines to boxes: TODO: should probably be added to lineCoordinates
-        lineToBoxes[line0[0]] = lineToBoxes[line0[0]] ? [...lineToBoxes[line0[0]], i]:[i];
-        lineToBoxes[line1[0]] = lineToBoxes[line1[0]] ? [...lineToBoxes[line1[0]], i]:[i];
-        lineToBoxes[line2[0]] = lineToBoxes[line2[0]] ? [...lineToBoxes[line2[0]], i]:[i];
-        lineToBoxes[line3[0]] = lineToBoxes[line3[0]] ? [...lineToBoxes[line3[0]], i]:[i];
+        lineToBoxes[line0Id] = lineToBoxes[line0Id] ? [...lineToBoxes[line0Id], i]:[i];
+        lineToBoxes[line1Id] = lineToBoxes[line1Id] ? [...lineToBoxes[line1Id], i]:[i];
+        lineToBoxes[line2Id] = lineToBoxes[line2Id] ? [...lineToBoxes[line2Id], i]:[i];
+        lineToBoxes[line3Id] = lineToBoxes[line3Id] ? [...lineToBoxes[line3Id], i]:[i];
       }
     }
 
@@ -86,7 +89,7 @@ class App extends React.Component {
       // console.log(this.findALineFromCoordinates({x1:430,y1:430, x2:430,y2:520}));
       // console.log(this.state.boxCoordinates);
       // console.log(this.state.lineCoordinates);
-      console.log(this.state.lineToBoxes);
+      // console.log(this.state.lineToBoxes);
     });
   }
 
@@ -105,27 +108,36 @@ class App extends React.Component {
             <text x="465" y="57" fill="maroon">2</text>
 
             <rect y="90" width="500" height="500" fill="lightblue"/>
-            {
-              Object.keys(this.state.boxCoordinates).map((i) => {
-                let iNum = Number(i);
-                let points = `${this.state.boxCoordinates[iNum].x1},${this.state.boxCoordinates[iNum].y1} `;
-                points+= `${this.state.boxCoordinates[iNum].x2},${this.state.boxCoordinates[iNum].y2} `;
-                points+= `${this.state.boxCoordinates[iNum].x3},${this.state.boxCoordinates[iNum].y3} `;
-                points+= `${this.state.boxCoordinates[iNum].x4},${this.state.boxCoordinates[iNum].y4} `;
-                return <polygon key={i} points={points} fill="#B7B7B7" stroke="white"/>;
+            <ClickedContext.Provider value={{
+              state: this.state,
+              setClickedLineId:(value) => this.setState({clickedLineId:value})}}>
+                {
+                  Object.keys(this.state.boxCoordinates).map((i) => {
+                    let iNum = Number(i);
+                    let points = `${this.state.boxCoordinates[iNum].x1},${this.state.boxCoordinates[iNum].y1} `;
+                    points+= `${this.state.boxCoordinates[iNum].x2},${this.state.boxCoordinates[iNum].y2} `;
+                    points+= `${this.state.boxCoordinates[iNum].x3},${this.state.boxCoordinates[iNum].y3} `;
+                    points+= `${this.state.boxCoordinates[iNum].x4},${this.state.boxCoordinates[iNum].y4} `;
+                    return <Box key={i} points={points} i={i}
+                      txtPoints={{x1:this.state.boxCoordinates[iNum].x1, y1: this.state.boxCoordinates[iNum].y1}}
+                      lineIdsOfBox={[this.state.boxCoordinates[iNum].line0Id,
+                        this.state.boxCoordinates[iNum].line1Id,
+                        this.state.boxCoordinates[iNum].line2Id,
+                        this.state.boxCoordinates[iNum].line3Id]}/>;
+                    }
+                  )
                 }
-              )
-            }
 
-            {
-              Object.keys(this.state.lineCoordinates).map((i) => {
-                let result = [];
-                result.push(<Line key={'line'+i} i={i} x1={this.state.lineCoordinates[i].x1} y1={this.state.lineCoordinates[i].y1}
-                  x2={this.state.lineCoordinates[i].x2} y2={this.state.lineCoordinates[i].y2}></Line>);
-                return result;
+                {
+                  Object.keys(this.state.lineCoordinates).map((i) => {
+                    let result = [];
+                    result.push(<Line key={'line'+i} i={i} x1={this.state.lineCoordinates[i].x1} y1={this.state.lineCoordinates[i].y1}
+                      x2={this.state.lineCoordinates[i].x2} y2={this.state.lineCoordinates[i].y2}></Line>);
+                    return result;
+                  }
+                )
               }
-            )
-          }
+            </ClickedContext.Provider>
             {Object.keys(this.state.dotCoordinates).map((i) => {
               let result = <circle cx={this.state.dotCoordinates[i].x} cy={this.state.dotCoordinates[i].y} r="10" fill="maroon" key={i}/>;
               return result;
@@ -138,13 +150,13 @@ class App extends React.Component {
   }
 
   findALineFromCoordinates({x1,y1,x2,y2}, lineCoordinates){
-    let lineItems = lineCoordinates? (Object.entries(lineCoordinates)): Object.entries(this.state.lineCoordinates);
+    let lineItemsKeys = lineCoordinates? (Object.keys(lineCoordinates)): Object.keys(this.state.lineCoordinates);
     let result={};
-    for(let i=0;i<lineItems.length;i++)
+    for(let i=0;i<lineItemsKeys.length;i++)
     {
-      let lineItem = lineItems[i][1];
+      let lineItem = lineCoordinates[lineItemsKeys[i]]
       if(lineItem.x1===x1 && lineItem.x2===x2 && lineItem.y1===y1 && lineItem.y2===y2){
-        result = lineItems[i]; break;
+        result = lineItemsKeys[i]; break;
       }
     }
     return result;

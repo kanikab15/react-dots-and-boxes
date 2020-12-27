@@ -10,7 +10,6 @@ class App extends React.Component {
     dotCoordinates : {},
     lineCoordinates: {},
     boxCoordinates: {},
-    lineToBoxes: {},
     clickedLineId:"",
     player1IsNext: true
     // wasPrevTurnACapture: false
@@ -25,7 +24,6 @@ class App extends React.Component {
     const dotCoordinates = {};
     const lineCoordinates = {};
     const boxCoordinates = {};
-    const lineToBoxes = {};
 
     // find dot coordinates
     for(let i=0; i<numOfDots; i++){
@@ -76,25 +74,47 @@ class App extends React.Component {
         boxCoordinates[i].line2Id = line2Id;
         boxCoordinates[i].line3Id = line3Id;
 
-        // map lines to boxes: TODO: should probably be added to lineCoordinates
-        lineToBoxes[line0Id] = lineToBoxes[line0Id] ? [...lineToBoxes[line0Id], i]:[i];
-        lineToBoxes[line1Id] = lineToBoxes[line1Id] ? [...lineToBoxes[line1Id], i]:[i];
-        lineToBoxes[line2Id] = lineToBoxes[line2Id] ? [...lineToBoxes[line2Id], i]:[i];
-        lineToBoxes[line3Id] = lineToBoxes[line3Id] ? [...lineToBoxes[line3Id], i]:[i];
+        // map lines to boxes:
+        lineCoordinates[line0Id]["lineToBoxes"] = lineCoordinates[line0Id]["lineToBoxes"] ? [...lineCoordinates[line0Id]["lineToBoxes"], i]:[i];
+        lineCoordinates[line1Id]["lineToBoxes"] = lineCoordinates[line1Id]["lineToBoxes"] ? [...lineCoordinates[line1Id]["lineToBoxes"], i]:[i];
+        lineCoordinates[line2Id]["lineToBoxes"] = lineCoordinates[line2Id]["lineToBoxes"] ? [...lineCoordinates[line2Id]["lineToBoxes"], i]:[i];
+        lineCoordinates[line3Id]["lineToBoxes"] = lineCoordinates[line3Id]["lineToBoxes"] ? [...lineCoordinates[line3Id]["lineToBoxes"], i]:[i];
       }
     }
 
     this.setState({ lineCoordinates: lineCoordinates,
                     dotCoordinates: dotCoordinates,
                     boxCoordinates: boxCoordinates,
-                    lineToBoxes: lineToBoxes
                   },()=>{
       // console.log(this.findALineFromCoordinates({x1:430,y1:430, x2:430,y2:520}));
       // console.log(this.state.boxCoordinates);
       // console.log(this.state.lineCoordinates);
-      // console.log(this.state.lineToBoxes);
     });
   }
+
+handleClick = (lineId) =>{
+  if(!this.state.lineCoordinates[lineId].isClicked){
+    const lineCoordinates = this.state.lineCoordinates;
+    lineCoordinates[lineId].isClicked = true;
+    this.setState({lineCoordinates: lineCoordinates},()=>{
+     const isAnyBoxCaptured = this.state.lineCoordinates[lineId].lineToBoxes.reduce((isAnyPrevBoxCaptured, currBoxId) => {
+      // go over all box ids, see if their lines have been clicked i.e. is box captured
+      const l1 = this.state.boxCoordinates[currBoxId].line0Id
+      const l2 = this.state.boxCoordinates[currBoxId].line1Id
+      const l3 = this.state.boxCoordinates[currBoxId].line2Id
+      const l4 = this.state.boxCoordinates[currBoxId].line3Id
+
+      const isCurrBoxCaptured = [l1,l2,l3,l4].reduce((areLinesClicked, currLineId) => {
+        return(areLinesClicked && this.state.lineCoordinates[currLineId].isClicked)
+      }, true);
+      return(isAnyPrevBoxCaptured || isCurrBoxCaptured);
+    }, false);
+    console.log(isAnyBoxCaptured);
+    if(!isAnyBoxCaptured)
+      this.setState({player1IsNext: !this.state.player1IsNext});
+    });
+  }
+}
 
   render() {
     return (
@@ -136,7 +156,8 @@ class App extends React.Component {
                   Object.keys(this.state.lineCoordinates).map((i) => {
                     let result = [];
                     result.push(<Line key={'line'+i} i={i} x1={this.state.lineCoordinates[i].x1} y1={this.state.lineCoordinates[i].y1}
-                      x2={this.state.lineCoordinates[i].x2} y2={this.state.lineCoordinates[i].y2}></Line>);
+                      x2={this.state.lineCoordinates[i].x2} y2={this.state.lineCoordinates[i].y2}
+                      onClick={this.handleClick}></Line>);
                     return result;
                   }
                 )

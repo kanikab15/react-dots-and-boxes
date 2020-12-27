@@ -6,15 +6,13 @@ class Box extends React.Component{
 
   constructor(props){
     super(props);
-    let areLinesOfBoxActive = props.lineIdsOfBox.reduce((result, key) => ({...result, [key]: false}), {});
+    let areLinesOfBoxActive = props.lineIdsOfBox.reduce((lineIdToActiveStatus, lineId) => ({...lineIdToActiveStatus, [lineId]: false}), {});
 
     this.state = {
       areLinesOfBoxActive: areLinesOfBoxActive,
       boxCapturedByPlayerColor: ""
     }
   }
-
-  static wasPrevTurnACapture = false;
 
   componentDidUpdate(){
     let context = this.context;
@@ -30,10 +28,6 @@ class Box extends React.Component{
       this.setState({ // minimize set states
         areLinesOfBoxActive: areLinesOfBoxActive,
         boxCapturedByPlayerColor: boxCapturedByPlayerColor});
-      // this.props.handleTurn(isBoxCaptured, Box.wasPrevTurnACapture);
-      // console.log("before", Box.wasPrevTurnACapture);
-      // Box.wasPrevTurnACapture = isBoxCaptured;
-      // console.log("after", Box.wasPrevTurnACapture);
     }
   }
 

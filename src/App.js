@@ -11,8 +11,10 @@ class App extends React.Component {
     lineCoordinates: {},
     boxCoordinates: {},
     clickedLineId:"",
-    player1IsNext: true
-    // wasPrevTurnACapture: false
+    player1IsNext: true,
+    player1Score: 0,
+    player2Score: 0,
+    result: ''
   };
 
   componentDidMount(){
@@ -96,6 +98,13 @@ handleClick = (lineId) =>{
   if(!this.state.lineCoordinates[lineId].isClicked){
     const lineCoordinates = this.state.lineCoordinates;
     lineCoordinates[lineId].isClicked = true;
+
+    let scoreToAdd = 0;
+    const boxCoordinates = this.state.boxCoordinates;
+    let player1Score = this.state.player1Score;
+    let player2Score = this.state.player2Score;
+    let player1IsNext = this.state.player1IsNext;
+
     this.setState({lineCoordinates: lineCoordinates},()=>{
      const isAnyBoxCaptured = this.state.lineCoordinates[lineId].lineToBoxes.reduce((isAnyPrevBoxCaptured, currBoxId) => {
       // go over all box ids, see if their lines have been clicked i.e. is box captured
@@ -107,11 +116,43 @@ handleClick = (lineId) =>{
       const isCurrBoxCaptured = [l1,l2,l3,l4].reduce((areLinesClicked, currLineId) => {
         return(areLinesClicked && this.state.lineCoordinates[currLineId].isClicked)
       }, true);
+      if(isCurrBoxCaptured){
+        scoreToAdd++;
+        boxCoordinates[currBoxId].isCaptured = true;
+      }
       return(isAnyPrevBoxCaptured || isCurrBoxCaptured);
     }, false);
     console.log(isAnyBoxCaptured);
-    if(!isAnyBoxCaptured)
-      this.setState({player1IsNext: !this.state.player1IsNext});
+    if(isAnyBoxCaptured && this.state.player1IsNext){
+      player1Score = player1Score + scoreToAdd;
+    }
+    else if(isAnyBoxCaptured && !this.state.player1IsNext){
+      player2Score = player2Score + scoreToAdd;
+    }
+    else if(!isAnyBoxCaptured)
+      player1IsNext = !player1IsNext;
+
+    this.setState({
+      boxCoordinates: boxCoordinates,
+      player1Score: player1Score,
+      player2Score: player2Score,
+      player1IsNext: player1IsNext
+      },() =>{
+        console.log(this.state.boxCoordinates);
+        let result='';
+        const areAllBoxesCaptured = Object.values(this.state.boxCoordinates).reduce((areBoxesCaptured, currBox) => {
+          console.log(areBoxesCaptured && currBox.isCaptured);
+          return(areBoxesCaptured && currBox.isCaptured);
+        }, true);
+        if(areAllBoxesCaptured)
+          if(this.state.player1Score > this.state.player2Score)
+            result="Player 1 wins!";
+          else if(this.state.player1Score < this.state.player2Score)
+            result="Player 2 wins!";
+          else if(this.state.player1Score === this.state.player2Score)
+            result = "It's a draw!";
+        this.setState({result: result});
+      });
     });
   }
 }
@@ -122,15 +163,19 @@ handleClick = (lineId) =>{
         <header className="App-header">
           <svg height="500" width="500" viewBox="0 0 600 600" >
 
-            <circle cx="30" cy="17" r="17" fill={constants.player1Color}/>
-            <rect x="5" y="35" width="50" height="30" rx="10" fill={constants.player1Color}/>
-            <text x="23" y="57" fill="maroon">1</text>
+            <circle cx="30" cy="20" r="17" fill={constants.player1Color}
+              stroke={this.state.player1IsNext? 'lightblue': 'none'} stroke-width="3"/>
+            <rect x="5" y="38" width="50" height="30" rx="10" fill={constants.player1Color}
+              stroke={this.state.player1IsNext? 'lightblue': 'none'} stroke-width="3"/>
+            <text x="63" y="57" fill="maroon">{this.state.player1Score}</text>
 
-            <text x="80" y="57" fill="maroon">{this.state.player1IsNext? 'Player 1 is up': 'Player 2 is up'}</text>
+            <text x="180" y="57" fill="maroon">{this.state.result}</text>
 
-            <circle cx="470" cy="17" r="17" fill={constants.player2Color}/>
-            <rect x="445" y="35" width="50" height="30" rx="10" fill={constants.player2Color}/>
-            <text x="465" y="57" fill="maroon">2</text>
+            <circle cx="470" cy="20" r="17" fill={constants.player2Color}
+              stroke={!this.state.player1IsNext? 'lightblue': 'none'} stroke-width="3"/>
+            <rect x="445" y="38" width="50" height="30" rx="10" fill={constants.player2Color}
+              stroke={!this.state.player1IsNext? 'lightblue': 'none'} stroke-width="3"/>
+            <text x="425" y="57" fill="maroon">{this.state.player2Score}</text>
 
             <rect y="90" width="500" height="500" fill="lightblue"/>
             <ClickedContext.Provider value={{

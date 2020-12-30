@@ -6,7 +6,6 @@ class Line extends React.Component{
   line = React.createRef();
 
   handleClick = (context) => {
-    console.log('click'+this.props.i);
     this.line.current.classList.add("line-clicked");
     context.setClickedLineId(this.props.i);
     this.props.onClick(this.props.i);

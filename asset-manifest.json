@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/react-dots-and-boxes/static/css/main.16293302.chunk.css",
+    "main.js": "/react-dots-and-boxes/static/js/main.bb48dd2d.chunk.js",
+    "main.js.map": "/react-dots-and-boxes/static/js/main.bb48dd2d.chunk.js.map",
+    "runtime-main.js": "/react-dots-and-boxes/static/js/runtime-main.4b275c60.js",
+    "runtime-main.js.map": "/react-dots-and-boxes/static/js/runtime-main.4b275c60.js.map",
+    "static/js/2.afb3d1cc.chunk.js": "/react-dots-and-boxes/static/js/2.afb3d1cc.chunk.js",
+    "static/js/2.afb3d1cc.chunk.js.map": "/react-dots-and-boxes/static/js/2.afb3d1cc.chunk.js.map",
+    "index.html": "/react-dots-and-boxes/index.html",
+    "precache-manifest.52436e4aa5234415fe7692dcd8f7e238.js": "/react-dots-and-boxes/precache-manifest.52436e4aa5234415fe7692dcd8f7e238.js",
+    "service-worker.js": "/react-dots-and-boxes/service-worker.js",
+    "static/css/main.16293302.chunk.css.map": "/react-dots-and-boxes/static/css/main.16293302.chunk.css.map",
+    "static/js/2.afb3d1cc.chunk.js.LICENSE.txt": "/react-dots-and-boxes/static/js/2.afb3d1cc.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.4b275c60.js",
+    "static/js/2.afb3d1cc.chunk.js",
+    "static/css/main.16293302.chunk.css",
+    "static/js/main.bb48dd2d.chunk.js"
+  ]
+}
